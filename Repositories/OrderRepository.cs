@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Models;
+using System.Configuration;
 
 namespace Repositories
 {
@@ -10,17 +11,22 @@ namespace Repositories
 
         public OrderRepository()
         {
-            Conn = "Data Source = 127.0.0.1; Initial Catalog=5by5-ProjAula4Andre; User Id=sa; Password=SqlServer2019!; TrustServerCertificate=True;";
+            Conn = ConfigurationManager.ConnectionStrings["StringConnection"].ConnectionString;
         }
 
-        public bool Insert(Order o)
+        public bool Insert(Order order)
         {
             var status = false;
 
             using (var db = new SqlConnection(Conn))
             {
                 db.Open();
-                db.Execute("INSERT INTO TB_ORDER (DESCRIPTION_ORDER, TABLE_ORDER) VALUES (@DESCRIPTION, @TABLE)", o);
+                db.Execute("INSERT INTO TB_ORDER (DESCRIPTION_ORDER, TABLE_ORDER, ITEM_ID) VALUES (@Desc, @Tb, @Id", new
+                {
+                    Desc = order.Description,
+                    Tb = order.Table,
+                    Id = order?.Item?.Id
+                });
                 status = true;
                 db.Close();
             }
